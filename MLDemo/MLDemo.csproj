@@ -7,6 +7,11 @@
 
   <ItemGroup>
     <Folder Include="Data\" />
+    <Folder Include="MLModels\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ML" Version="0.8.0" />
   </ItemGroup>
 
 </Project>
