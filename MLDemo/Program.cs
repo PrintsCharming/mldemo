@@ -32,7 +32,7 @@ namespace MLDemo
                 HasHeader = false,
                 Column = new[]
                 {
-                    new TextLoader.Column("CategoryID", DataKind.Text, 0),
+                    new TextLoader.Column("CategoryID", DataKind.Num, 0),
                     new TextLoader.Column("Title", DataKind.Text, 1),
                     new TextLoader.Column("Description", DataKind.Text, 2),
                     }
@@ -40,12 +40,12 @@ namespace MLDemo
 
             var traindata = reader.Read(TrainDataPath);
 
-            var est = ctx.Transforms.Conversion.MapValueToKey("CatID", "Label")
+            var est = ctx.Transforms.Conversion.MapValueToKey("CategoryID", "Label")
                 .Append(ctx.Transforms.Text.FeaturizeText("Title", "Title_featurized"))
                 .Append(ctx.Transforms.Text.FeaturizeText("Description", "Description_featurized"))
                 .Append(ctx.Transforms.Concatenate("Features", "Title_featurized", "Description_featurized"))
                 .Append(ctx.MulticlassClassification.Trainers.StochasticDualCoordinateAscent("Label", "Features"))
-                .Append(ctx.Transforms.Conversion.MapKeyToValue("CatID"));
+                .Append(ctx.Transforms.Conversion.MapKeyToValue("CategoryID"));
 
 
             var model = est.Fit(traindata);
