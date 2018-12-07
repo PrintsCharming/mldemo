@@ -7,7 +7,7 @@ namespace MLDemo
 {
     public class ItemPrediction
     {
-        [ColumnName("PredictedLabel")]
+        [ColumnName("PredictedCatID")]
         public string CategoryID;
     }
 }

@@ -41,12 +41,12 @@ namespace MLDemo
             //var traindata = reader.Read("/users/ryansmith/Projects/mldemo/MlDemo/Data/trainingdata.tsv");
             var traindata = reader.Read(TrainDataPath);
 
-            var est = ctx.Transforms.Conversion.MapValueToKey("CategoryID", "Label")
+            var est = ctx.Transforms.Conversion.MapValueToKey("CategoryID", "CatID")
                 .Append(ctx.Transforms.Text.FeaturizeText("Title", "Title_featurized"))
                 .Append(ctx.Transforms.Text.FeaturizeText("Description", "Description_featurized"))
                 .Append(ctx.Transforms.Concatenate("Features", "Title_featurized", "Description_featurized"))
-                .Append(ctx.MulticlassClassification.Trainers.StochasticDualCoordinateAscent("Label", "Features"))
-                .Append(ctx.Transforms.Conversion.MapKeyToValue("PredictedLabel"));
+                .Append(ctx.MulticlassClassification.Trainers.StochasticDualCoordinateAscent("CatID", "Features"))
+                .Append(ctx.Transforms.Conversion.MapKeyToValue("PredictedCatID"));
 
 
             var model = est.Fit(traindata);
