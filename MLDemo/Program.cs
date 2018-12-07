@@ -5,6 +5,7 @@ using Microsoft.ML.Runtime.Data;
 using Microsoft.ML;
 using Microsoft.ML.Core.Data;
 using System.Diagnostics;
+using Microsoft.ML.Legacy.Transforms;
 
 namespace MLDemo
 {
@@ -45,7 +46,7 @@ namespace MLDemo
             //var traindata = reader.Read("/users/ryansmith/Projects/mldemo/MlDemo/Data/trainingdata.tsv");
             var traindata = reader.Read(TrainDataPath);
             var traindata10k = reader.Read(TrainData10kPath);
-            
+
 
             var est = ctx.Transforms.Conversion.MapValueToKey("CategoryID", "Label")
                 .Append(ctx.Transforms.Text.FeaturizeText("Title", "Title_featurized"))
