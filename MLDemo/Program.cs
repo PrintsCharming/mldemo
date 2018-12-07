@@ -10,11 +10,11 @@ namespace MLDemo
     class Program
     {
         private static string AppPath => Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]);
-        private static string BaseDatasetsLocation = @"../../../Data";
-        private static string TrainDataPath = $"{BaseDatasetsLocation}/trainingdata.tsv";
+        private static string BaseDatasetsLocation = @"../../../../Data";
+        private static string TrainDataPath = $"./Data/trainingdata.tsv";
         private static string TestDataPath = $"{BaseDatasetsLocation}/testingdata.tsv";
         private static string BaseModelsPath = @"../../../MLModels";
-        private static string ModelPath = $"{BaseModelsPath}/ItemCategorizationModel.zip";
+        private static string ModelPath = $"./Data/ItemCategorizationModel.zip";
 
         public enum MyTrainerStrategy : int
         {
@@ -32,12 +32,13 @@ namespace MLDemo
                 HasHeader = false,
                 Column = new[]
                 {
-                    new TextLoader.Column("CategoryID", DataKind.Num, 0),
+                    new TextLoader.Column("CategoryID", DataKind.Text, 0),
                     new TextLoader.Column("Title", DataKind.Text, 1),
                     new TextLoader.Column("Description", DataKind.Text, 2),
                     }
             });
 
+            //var traindata = reader.Read("/users/ryansmith/Projects/mldemo/MlDemo/Data/trainingdata.tsv");
             var traindata = reader.Read(TrainDataPath);
 
             var est = ctx.Transforms.Conversion.MapValueToKey("CategoryID", "Label")
@@ -45,7 +46,7 @@ namespace MLDemo
                 .Append(ctx.Transforms.Text.FeaturizeText("Description", "Description_featurized"))
                 .Append(ctx.Transforms.Concatenate("Features", "Title_featurized", "Description_featurized"))
                 .Append(ctx.MulticlassClassification.Trainers.StochasticDualCoordinateAscent("Label", "Features"))
-                .Append(ctx.Transforms.Conversion.MapKeyToValue("CategoryID"));
+                .Append(ctx.Transforms.Conversion.MapKeyToValue("PredictedLabel"));
 
 
             var model = est.Fit(traindata);
