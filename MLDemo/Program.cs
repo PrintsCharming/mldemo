@@ -13,7 +13,7 @@ namespace MLDemo
         private static string AppPath => Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]);
         private static string BaseDatasetsLocation = @"../../../../Data";
         private static string TrainDataPath = $"./Data/trainingdata.tsv";
-        private static string TestDataPath = $"{BaseDatasetsLocation}/testingdata.tsv";
+        private static string TestDataPath = $"./Data/testingdata.tsv";
         private static string BaseModelsPath = @"../../../MLModels";
         private static string ModelPath = $"./Data/ItemCategorizationModel.zip";
 
@@ -41,6 +41,7 @@ namespace MLDemo
 
             //var traindata = reader.Read("/users/ryansmith/Projects/mldemo/MlDemo/Data/trainingdata.tsv");
             var traindata = reader.Read(TrainDataPath);
+            
 
             var est = ctx.Transforms.Conversion.MapValueToKey("CategoryID", "Label")
                 .Append(ctx.Transforms.Text.FeaturizeText("Title", "Title_featurized"))
@@ -58,6 +59,12 @@ namespace MLDemo
             Console.WriteLine("Time elapsed: {0}", stopwatch.Elapsed);
 
             var predictionEngine = model.MakePredictionFunction<ItemData, ItemPrediction>(ctx);
+
+            var testdata = reader.Read(TestDataPath);
+            var predictions = model.Transform(testdata);
+            var metrics = ctx.MulticlassClassification.Evaluate(predictions, "Label", "Score");
+
+            ConsoleHelper.PrintMultiClassClassificationMetrics("Demo", metrics);
 
             var prediction = predictionEngine.Predict(new ItemData
             {
