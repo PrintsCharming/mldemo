@@ -13,9 +13,12 @@ namespace MLDemo
         private static string AppPath => Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]);
         private static string BaseDatasetsLocation = @"../../../../Data";
         private static string TrainDataPath = $"./Data/trainingdata.tsv";
+        private static string TrainData10kPath = $"./Data/trainingdata10k.tsv";
+
         private static string TestDataPath = $"./Data/testingdata.tsv";
         private static string BaseModelsPath = @"../../../MLModels";
         private static string ModelPath = $"./Data/ItemCategorizationModel.zip";
+        private static string Model10kPath = $"./Data/ItemCategorizationModel10k.zip";
 
         public enum MyTrainerStrategy : int
         {
@@ -41,6 +44,7 @@ namespace MLDemo
 
             //var traindata = reader.Read("/users/ryansmith/Projects/mldemo/MlDemo/Data/trainingdata.tsv");
             var traindata = reader.Read(TrainDataPath);
+            var traindata10k = reader.Read(TrainData10kPath);
             
 
             var est = ctx.Transforms.Conversion.MapValueToKey("CategoryID", "Label")
@@ -58,13 +62,27 @@ namespace MLDemo
                 ctx.Model.Save(model, fs);
             Console.WriteLine("Time elapsed: {0}", stopwatch.Elapsed);
 
+            stopwatch.Reset();
+            stopwatch.Start();
+            var model10k = est.Fit(traindata10k);
+            stopwatch.Stop();
+            using (var fs = new FileStream(Model10kPath, FileMode.Create, FileAccess.Write, FileShare.Write))
+                ctx.Model.Save(model10k, fs);
+            Console.WriteLine("Time elapsed: {0}", stopwatch.Elapsed);
+
+
             var predictionEngine = model.MakePredictionFunction<ItemData, ItemPrediction>(ctx);
+            var predictionEngine10k = model10k.MakePredictionFunction<ItemData, ItemPrediction>(ctx);
 
             var testdata = reader.Read(TestDataPath);
             var predictions = model.Transform(testdata);
+            var predictions10k = model10k.Transform(testdata);
+
             var metrics = ctx.MulticlassClassification.Evaluate(predictions, "Label", "Score");
+            var metrics10k = ctx.MulticlassClassification.Evaluate(predictions10k, "Label", "Score");
 
             ConsoleHelper.PrintMultiClassClassificationMetrics("Demo", metrics);
+            ConsoleHelper.PrintMultiClassClassificationMetrics("Demo10k", metrics10k);
 
             var prediction = predictionEngine.Predict(new ItemData
             {
