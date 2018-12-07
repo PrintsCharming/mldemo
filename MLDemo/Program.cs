@@ -4,6 +4,7 @@ using Microsoft.ML.Runtime.Learners;
 using Microsoft.ML.Runtime.Data;
 using Microsoft.ML;
 using Microsoft.ML.Core.Data;
+using System.Diagnostics;
 
 namespace MLDemo
 {
@@ -48,8 +49,11 @@ namespace MLDemo
                 .Append(ctx.MulticlassClassification.Trainers.StochasticDualCoordinateAscent("Label", "Features"))
                 .Append(ctx.Transforms.Conversion.MapKeyToValue("PredictedLabel"));
 
-
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
             var model = est.Fit(traindata);
+            stopwatch.Stop();
+            Console.WriteLine("Time elapsed: {0}", stopwatch.Elapsed);
 
             var predictionEngine = model.MakePredictionFunction<ItemData, ItemPrediction>(ctx);
 
@@ -58,6 +62,8 @@ namespace MLDemo
                 Title = "Sony Blu-Ray Player",
                 Description = "Blu-Ray player from Sony, black powers on"
             });
+
+            Console.WriteLine("Predicted catid:{0}", prediction.CategoryID);
 
         }
 
