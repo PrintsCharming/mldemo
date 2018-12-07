@@ -53,6 +53,8 @@ namespace MLDemo
             stopwatch.Start();
             var model = est.Fit(traindata);
             stopwatch.Stop();
+            using (var fs = new FileStream(ModelPath, FileMode.Create, FileAccess.Write, FileShare.Write))
+                ctx.Model.Save(model, fs);
             Console.WriteLine("Time elapsed: {0}", stopwatch.Elapsed);
 
             var predictionEngine = model.MakePredictionFunction<ItemData, ItemPrediction>(ctx);
